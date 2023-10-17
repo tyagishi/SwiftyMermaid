@@ -6,17 +6,18 @@ struct SwiftyMermaidCommandPlugin: CommandPlugin {
     // Entry point for command plugins applied to Swift Packages.
     func performCommand(context: PluginContext, arguments: [String]) async throws {
         print("Hello, World1!")
-        
+        print("plugin dir: \(context.pluginWorkDirectory)")
         let swiftymermaid = try context.tool(named: "swiftymermaid")
         
-        let projectURL = URL(fileURLWithPath: "/Volumes/SmallDesk/SmallDeskSoftware/dev/SwiftUI2023_202310/PluginSampleProject")
-        try outputFile(tool: swiftymermaid, projectURL)
+        try outputFile(tool: swiftymermaid, arguments[1])
+        print("done outputFile")
     }
     
-    func outputFile(tool: PluginContext.Tool,_ folderURL: URL) throws {
+    func outputFile(tool: PluginContext.Tool,_ folderURLString: String) throws {
         let process = Process()
+        print("path: \(tool.path.string)")
         process.executableURL = URL(fileURLWithPath: tool.path.string)
-        process.arguments = ["\(folderURL.absoluteString)"]
+        process.arguments = ["\(folderURLString)"]
         
         let outputPipe = Pipe()
         process.standardOutput = outputPipe
@@ -25,6 +26,9 @@ struct SwiftyMermaidCommandPlugin: CommandPlugin {
         process.waitUntilExit()
         
         let mermaidData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+        guard let mermaidString = String(data: mermaidData, encoding: .utf8) else { return }
+        print("output from SwiftyMermaid")
+        print(mermaidString)
 
         let fileURL = URL(filePath: "FromCommandPlugin.txt")
         try mermaidData.write(to: fileURL)
@@ -39,12 +43,14 @@ extension SwiftyMermaidCommandPlugin: XcodeCommandPlugin {
     func performCommand(context: XcodePluginContext, arguments: [String]) throws {
         let swiftymermaid = try context.tool(named: "swiftymermaid")
         print("Hello, World2!")
-        let projectURL = URL(fileURLWithPath: "/Volumes/SmallDesk/SmallDeskSoftware/dev/SwiftUI2023_202310/PluginSampleProject")
+        print("plugin dir: \(context.xcodeProject.directory)")
+
         do {
-            try outputFile(tool: swiftymermaid, projectURL)
+            try outputFile(tool: swiftymermaid, context.xcodeProject.directory.string)
         } catch {
             print(error.localizedDescription)
         }
+        print("done outputFile")
     }
 }
 

@@ -5,10 +5,47 @@ import Foundation
 import HatchParser
 import ArgumentParser
 
+@main
 struct SwiftyMermaid: ParsableCommand {
-    static func main() {
-        print("Hello world")
+    @Argument(help: "input folder")
+    var folderURLString: String
+    
+    @Option(help: "output to file")
+    var outputFile: String? = nil
+    
+    mutating func run() throws {
+
+        let helloData = "Hello".data(using: .utf8)!
+        try FileHandle.standardOutput.write(contentsOf: helloData)
+
+        let specifiedPath = (folderURLString as NSString).expandingTildeInPath
+        guard FileManager.default.fileExists(atPath: specifiedPath) else { return }
+        guard let folderURL = URL(string: specifiedPath) else { return }
+
+        print("input: \(folderURL.absoluteString)")
+        
+        let extractedSymbols = try Self.parseProject(folderURL)
+        let extractedMermaid = Self.mermaid(from: extractedSymbols)
+
+        print("mermaid: \(extractedMermaid)")
+        
+        if let outputFile = outputFile,
+           let outputURL = URL(string: outputFile) {
+            try extractedMermaid.data(using: .utf8)?.write(to: outputURL)
+        } else {
+            try FileHandle.standardOutput.write(contentsOf: extractedMermaid.data(using: .utf8)!)
+
+        }
     }
+    
+//    static func main() {
+//        let helloData = "Hello".data(using: .utf8)!
+//        do {
+//            try FileHandle.standardOutput.write(contentsOf: helloData)
+//        } catch {
+//            print(error.localizedDescription)
+//        }
+//    }
     public static func parseProject(_ parseURL: URL) throws -> [URL: [Symbol]] {
         var results: [URL: [Symbol]] = [:]
         let enumerator = FileManager.default.enumerator(at: parseURL, includingPropertiesForKeys: [URLResourceKey.isDirectoryKey],
