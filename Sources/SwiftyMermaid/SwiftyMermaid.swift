@@ -9,8 +9,11 @@ import ArgumentParser
 struct SwiftyMermaid: ParsableCommand {
     @Argument(help: "input folder")
     var folderURLString: String
+
+    @Option(help: "flag to include test(default: exclude test)")
+    var includeTest: Bool = false
     
-    @Option(help: "output to file")
+    @Option(help: "output file(default: classes.text)")
     var outputFile: String? = nil
     
     mutating func run() throws {
@@ -23,6 +26,7 @@ struct SwiftyMermaid: ParsableCommand {
 
         if let outputFile = outputFile,
            let outputURL = URL(string: outputFile) {
+            print("output to file")
             try extractedMermaid.data(using: .utf8)?.write(to: outputURL)
         } else {
             try FileHandle.standardOutput.write(contentsOf: extractedMermaid.data(using: .utf8)!)
