@@ -1,6 +1,3 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
-
 import Foundation
 import HatchParser
 import ArgumentParser
@@ -11,7 +8,7 @@ struct SwiftyMermaid: ParsableCommand {
     @Argument(help: "input folder")
     var folderURLString: String
 
-    @Option(help: "flag to include test(default: exclude test) note: not implemented yet")
+    @Flag(help: "flag to include test(default: exclude test) note: not implemented yet")
     var includeTest: Bool = false
     
     @Option(help: "output file(default: standard output)")
@@ -30,7 +27,6 @@ struct SwiftyMermaid: ParsableCommand {
             try extractedMermaid.data(using: .utf8)?.write(to: outputURL)
         } else {
             try FileHandle.standardOutput.write(contentsOf: extractedMermaid.data(using: .utf8)!)
-
         }
     }
 }

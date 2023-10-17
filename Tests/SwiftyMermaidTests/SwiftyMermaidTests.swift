@@ -1,5 +1,5 @@
 import XCTest
-@testable import swiftymermaid
+@testable import SwiftyMermaidLib
 
 final class SwiftyMermaidTests: XCTestCase {
     func testExample() throws {
@@ -10,7 +10,7 @@ final class SwiftyMermaidTests: XCTestCase {
     func test_testResourceAccess() async throws {
         let testBundle = Bundle(for: type(of: self))
         let testFileURL = try XCTUnwrap(testBundle.url(forResource: "File1", withExtension: "scode"))
-        let results = try SwiftyMermaid.parseFile(testFileURL)
+        let results = try SwiftyMermaidLib.parseFile(testFileURL)
         XCTAssertEqual(results.count, 3)
         dump(results)
     }

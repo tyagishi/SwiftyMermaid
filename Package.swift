@@ -32,7 +32,7 @@ let package = Package(
         .plugin(
             name: "SwiftyMermaidCommandPlugin",
             capability: .command(intent: .custom( verb: "SwiftyMermaidCommandPlugin",
-                                                  description: "prints hello world"),
+                                                  description: "extract structure from swift into mermaid format"),
                                  permissions: [.writeToPackageDirectory(reason: "output mermaid file")]),
             dependencies: [ "swiftymermaid" ]
         ),
