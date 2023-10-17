@@ -14,21 +14,13 @@ struct SwiftyMermaid: ParsableCommand {
     var outputFile: String? = nil
     
     mutating func run() throws {
-
-        let helloData = "Hello".data(using: .utf8)!
-        try FileHandle.standardOutput.write(contentsOf: helloData)
-
         let specifiedPath = (folderURLString as NSString).expandingTildeInPath
         guard FileManager.default.fileExists(atPath: specifiedPath) else { return }
         guard let folderURL = URL(string: specifiedPath) else { return }
 
-        print("input: \(folderURL.absoluteString)")
-        
         let extractedSymbols = try Self.parseProject(folderURL)
         let extractedMermaid = Self.mermaid(from: extractedSymbols)
 
-        print("mermaid: \(extractedMermaid)")
-        
         if let outputFile = outputFile,
            let outputURL = URL(string: outputFile) {
             try extractedMermaid.data(using: .utf8)?.write(to: outputURL)
@@ -38,14 +30,6 @@ struct SwiftyMermaid: ParsableCommand {
         }
     }
     
-//    static func main() {
-//        let helloData = "Hello".data(using: .utf8)!
-//        do {
-//            try FileHandle.standardOutput.write(contentsOf: helloData)
-//        } catch {
-//            print(error.localizedDescription)
-//        }
-//    }
     public static func parseProject(_ parseURL: URL) throws -> [URL: [Symbol]] {
         var results: [URL: [Symbol]] = [:]
         let enumerator = FileManager.default.enumerator(at: parseURL, includingPropertiesForKeys: [URLResourceKey.isDirectoryKey],
@@ -61,6 +45,7 @@ struct SwiftyMermaid: ParsableCommand {
         }
         return results
     }
+    
     public static func parseFile(_ fileURL: URL) throws -> [Symbol] {
         let codeString = try String(contentsOf: fileURL, encoding: .utf8)
         return try SymbolParser.parse(source: codeString)
@@ -68,15 +53,17 @@ struct SwiftyMermaid: ParsableCommand {
     
     public static func mermaid(from symbolWithURL: [URL: [Symbol]]) -> String {
         var resultString = ""
-        for symbols in symbolWithURL.values {
+        for url in symbolWithURL.keys {
+            resultString.append("%% \(url.lastPathComponent)\n")
+            guard let symbols = symbolWithURL[url] else { continue }
             for symbol in symbols {
-                resultString.append(Self.mermeidString(symbol, path: ""))
+                resultString.append(Self.mermaidString(symbol, path: ""))
             }
         }
         return resultString
     }
     
-    public static func mermeidString(_ symbol: Symbol, path: String) -> String {
+    public static func mermaidString(_ symbol: Symbol, path: String) -> String {
         var result = ""
 
         if let inherit = symbol as? InheritingSymbol {
@@ -95,7 +82,7 @@ struct SwiftyMermaid: ParsableCommand {
             if !symbol.children.isEmpty {
                 let pathForChild = path + inherit.name + "."
                 for child in symbol.children {
-                    result.append(Self.mermeidString(child, path: pathForChild))
+                    result.append(Self.mermaidString(child, path: pathForChild))
                 }
             }
         }
