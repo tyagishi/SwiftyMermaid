@@ -38,8 +38,7 @@ extension SwiftyMermaidCommandPlugin: XcodeCommandPlugin {
         let swiftymermaid = try context.tool(named: "swiftymermaid")
         var arguments = ArgumentExtractor(arguments)
         print(arguments)
-        if let output = arguments.extractOption(named: "--outputFile").first {
-            print("found --outputFile with \(output)")
+        if let output = arguments.extractOption(named: "outputFile").first {
             try outputFile(tool: swiftymermaid, context.xcodeProject.directory.string, outputFileURLString: output)
         } else {
             try outputFile(tool: swiftymermaid, context.xcodeProject.directory.string)

@@ -1,39 +1,8 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
-
 import Foundation
 import HatchParser
 import ArgumentParser
 
-@main
-struct SwiftyMermaid: ParsableCommand {
-    @Argument(help: "input folder")
-    var folderURLString: String
-
-    @Option(help: "flag to include test(default: exclude test)")
-    var includeTest: Bool = false
-    
-    @Option(help: "output file(default: classes.text)")
-    var outputFile: String? = nil
-    
-    mutating func run() throws {
-        let specifiedPath = (folderURLString as NSString).expandingTildeInPath
-        guard FileManager.default.fileExists(atPath: specifiedPath) else { return }
-        guard let folderURL = URL(string: specifiedPath) else { return }
-
-        let extractedSymbols = try Self.parseProject(folderURL)
-        let extractedMermaid = Self.mermaid(from: extractedSymbols)
-
-        if let outputFile = outputFile,
-           let outputURL = URL(string: outputFile) {
-            print("output to file")
-            try extractedMermaid.data(using: .utf8)?.write(to: outputURL)
-        } else {
-            try FileHandle.standardOutput.write(contentsOf: extractedMermaid.data(using: .utf8)!)
-
-        }
-    }
-    
+public struct SwiftyMermaidLib {
     public static func parseProject(_ parseURL: URL) throws -> [URL: [Symbol]] {
         var results: [URL: [Symbol]] = [:]
         let enumerator = FileManager.default.enumerator(at: parseURL, includingPropertiesForKeys: [URLResourceKey.isDirectoryKey],
