@@ -1,0 +1,29 @@
+//
+//  File1.swift
+//
+//  Created by : Tomoaki Yagishita on 2023/10/13
+//  © 2023  SmallDeskSoftware
+//
+
+import Foundation
+
+struct A1 {
+
+    struct BC {
+        struct C1 {}
+        struct C2 {}
+        struct C3 {}
+    }
+
+    struct BD {
+        struct D1 {}
+        struct D2 {}
+    }
+
+    struct BX {}
+}
+
+struct A2 {}
+
+enum MyEnum {}
+
