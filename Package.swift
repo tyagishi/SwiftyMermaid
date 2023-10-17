@@ -10,6 +10,7 @@ let package = Package(
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
+//        .library(name: "SwiftyMermaid", targets: ["SwiftyMermaid"]),
         .executable(name: "swiftymermaid", targets: ["swiftymermaid"]),
         .plugin( name: "SwiftyMermaidCommandPlugin",
                  targets: [ "SwiftyMermaidCommandPlugin" ]
@@ -20,6 +21,9 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.2.3")
     ],
     targets: [
+//        .target(name: "SwiftyMermaid",
+//                dependencies: [ .product(name: "HatchParser", package: "Hatch") ]
+//               ),
         .plugin(
             name: "SwiftyMermaidCommandPlugin",
             capability: .command(intent: .custom( verb: "SwiftyMermaidCommandPlugin",
