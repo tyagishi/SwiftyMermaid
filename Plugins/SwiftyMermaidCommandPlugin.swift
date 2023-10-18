@@ -8,7 +8,17 @@ struct SwiftyMermaidCommandPlugin: CommandPlugin {
         print("execute CommandPlugin")
         // Note: needs to be updated for handling selection from dialog
         let swiftymermaid = try context.tool(named: "swiftymermaid")
-        try outputFile(tool: swiftymermaid, arguments[1])
+
+        let basePath = context.package.directory
+        var arguments = ArgumentExtractor(arguments)
+
+        let output = arguments.extractOption(named: "outputFile").first ?? ""
+        
+        for target in arguments.extractOption(named: "target") {
+            let targetPath = basePath.appending(target)
+            print("target: \(basePath.appending(target))")
+            try outputFile(tool: swiftymermaid, targetPath.string, outputFileURLString: output)
+        }
     }
     
     func outputFile(tool: PluginContext.Tool,_ folderURLString: String, outputFileURLString: String = "") throws {
