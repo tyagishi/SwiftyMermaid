@@ -9,33 +9,41 @@ struct SwiftyMermaidCommandPlugin: CommandPlugin {
         // Note: needs to be updated for handling selection from dialog
         let swiftymermaid = try context.tool(named: "swiftymermaid")
 
-        let basePath = context.package.directory
         var arguments = ArgumentExtractor(arguments)
 
         let output = arguments.extractOption(named: "outputFile").first ?? ""
         
-        for target in arguments.extractOption(named: "target") {
-            let targetPath = basePath.appending(target)
-            print("target: \(basePath.appending(target))")
-            try outputFile(tool: swiftymermaid, targetPath.string, outputFileURLString: output)
-        }
+        let targetNames = arguments.extractOption(named: "target")
+        let targets = targetNames.isEmpty ? context.package.targets : try context.package.targets(named: targetNames)
+        
+        let toolTargets = targets.compactMap({ $0.sourceModule }).map({ $0.directory.string})
+        
+        try outputFile(tool: swiftymermaid, toolTargets, outputFileURLString: output)
+
     }
     
-    func outputFile(tool: PluginContext.Tool,_ folderURLString: String, outputFileURLString: String = "") throws {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: tool.path.string)
-        process.arguments = ["\(folderURLString)"]
+    func outputFile(tool: PluginContext.Tool,_ folderURLStrings: [String],
+                    outputFileURLString: String = "") throws {
+        print("execute for \(folderURLStrings) to \(outputFileURLString)")
+        var totalData: Data = Data()
         
-        let outputPipe = Pipe()
-        process.standardOutput = outputPipe
-        
-        try process.run()
-        process.waitUntilExit()
-        
-        let mermaidData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+        for folderURLString in folderURLStrings {
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: tool.path.string)
+            process.arguments = ["\(folderURLString)"]
+            
+            let outputPipe = Pipe()
+            process.standardOutput = outputPipe
+            try process.run()
+            process.waitUntilExit()
+            
+            let mermaidData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+            
+            totalData.append(mermaidData)
+        }
 
         let fileURL: URL = URL(filePath: (outputFileURLString=="") ? "classes.text" : outputFileURLString)
-        try mermaidData.write(to: fileURL)
+        try totalData.write(to: fileURL)
     }
 }
 
@@ -49,9 +57,9 @@ extension SwiftyMermaidCommandPlugin: XcodeCommandPlugin {
         var arguments = ArgumentExtractor(arguments)
         print(arguments)
         if let output = arguments.extractOption(named: "outputFile").first {
-            try outputFile(tool: swiftymermaid, context.xcodeProject.directory.string, outputFileURLString: output)
+            try outputFile(tool: swiftymermaid, [context.xcodeProject.directory.string], outputFileURLString: output)
         } else {
-            try outputFile(tool: swiftymermaid, context.xcodeProject.directory.string)
+            try outputFile(tool: swiftymermaid, [context.xcodeProject.directory.string])
         }
     }
 }
