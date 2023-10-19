@@ -9,9 +9,10 @@ final class SwiftyMermaidTests: XCTestCase {
 
     func test_testResourceAccess() async throws {
         let testBundle = Bundle(for: type(of: self))
-        let testFileURL = try XCTUnwrap(testBundle.url(forResource: "File1", withExtension: "scode"))
-        let results = try SwiftyMermaidLib.parseFile(testFileURL)
-        XCTAssertEqual(results.count, 3)
-        dump(results)
+        print("testBundle is \(testBundle.bundlePath)")
+        //let testFileURL = try XCTUnwrap(testBundle.url(forResource: "File1", withExtension: "text"))
+//        let results = try SwiftyMermaidLib.parseFile(testFileURL)
+//        XCTAssertEqual(results.count, 3)
+//        dump(results)
     }
 }

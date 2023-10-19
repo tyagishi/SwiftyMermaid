@@ -37,8 +37,12 @@ let package = Package(
             dependencies: [ "swiftymermaid" ]
         ),
         .testTarget(
-            name: "SwiftyMermaidTests",
-            dependencies: ["SwiftyMermaidLib"]),
-
+            name: "SwiftyMermaidLibTests",
+            dependencies: ["SwiftyMermaidLib",
+                           .product(name: "HatchParser", package: "Hatch")
+            ],
+            resources: [
+                .copy("Resources")
+            ])
     ]
 )
