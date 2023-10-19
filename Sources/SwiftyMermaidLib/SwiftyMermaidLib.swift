@@ -71,6 +71,8 @@ extension Symbol {
             return "extension"
         } else if self is Class {
             return "class"
+        } else if self is Actor {
+            return "actor"
         } else if self is Struct {
             return "struct"
         } else if self is Enum {
