@@ -40,11 +40,12 @@ public struct SwiftyMermaidLib {
         var result = ""
 
         if let inherit = symbol as? InheritingSymbol {
+            let inheritName = inherit.name.replacingOccurrences(of: ".", with: "_")
             for inheritedType in inherit.inheritedTypes {
-                result += "\(inheritedType)<|--\(inherit.name.replacingOccurrences(of: ".", with: "_"))\n"
+                result += "\(inheritedType)<|--\(inheritName)\n"
             }
             result += """
-                      class \(inherit.name.replacingOccurrences(of: ".", with: "_"))["\(path+inherit.name)"] {
+                      class \(inheritName)["\(path+inherit.name)"] {
                         <<\(symbol.typeName())>>\n
                       """
             // add properties/methods in the future....
