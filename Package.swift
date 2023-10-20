@@ -17,13 +17,15 @@ let package = Package(
                  )
     ],
     dependencies: [
-        .package(url: "https://github.com/sdidla/Hatch", from: "508.0.0"),
+        .package(url: "https://github.com/tyagishi/Hatch", branch: "main"),
+        .package(url: "https://github.com/apple/swift-syntax", from: "509.0.0"),
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.2.3")
     ],
     targets: [
         .target(name: "SwiftyMermaidLib",
                 dependencies: [
                     .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                    .product(name: "SwiftParser", package: "swift-syntax"),
                     .product(name: "HatchParser", package: "Hatch")]
                ),
         .executableTarget(name: "swiftymermaid",

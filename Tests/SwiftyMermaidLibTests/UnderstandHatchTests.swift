@@ -13,22 +13,39 @@ final class UnderstandHatchTests: XCTestCase {
     
     func test_Parse_empty() throws {
         let testString = ""
-        let symbols = try SymbolParser.parse(source: testString)
+        let symbols = SymbolParser.parse(source: testString)
         XCTAssertEqual(symbols.count, 0)
     }
     
-    func test_Parse_Basic1() throws {
-//        let testBundle = Bundle(for: type(of: self))
-//        print("testBundle path: \(testBundle.bundlePath)")
-//        let testFileURL = try XCTUnwrap(testBundle.url(forResource: "File1", withExtension: "scode"))
-//        print(testFileURL)
-//        let testString = try String(contentsOf: testFileURL, encoding: .utf8)
-//        
-//        let symbols = try SymbolParser.parse(source: testString)
-//        XCTAssertEqual(symbols.count, 3)
-        XCTAssertTrue(true)
+    func test_Parse_Struct() throws {
+        let codeString = """
+                         struct A1 {}
+                         struct A2 {}
+                         enum MyEnum {}
+                         """
+        let symbols = SymbolParser.parse(source: codeString)
+        XCTAssertEqual(symbols.count, 3)
     }
     
+    func test_Parse_StructAndItsVariable() throws {
+        let codeString = """
+                         struct A1 {
+                           var value: Int
+                         }
+                         """
+        let symbols = SymbolParser.parse(source: codeString)
+        XCTAssertEqual(symbols.count, 1)
+    }
+    
+    func test_Parse_ActorType() throws {
+        let codeString = """
+                         actor A1 {
+                         }
+
+                         """
+        let symbols = SymbolParser.parse(source: codeString)
+        XCTAssertEqual(symbols.count, 1)
+    }
 //    func test_FileManager_contentsOfDirectory() throws {
 //        let tmpURL = FileManager.default.temporaryDirectory
 //        let enumerator = FileManager.default.enumerator(at: tmpURL, includingPropertiesForKeys: [.isDirectoryKey],

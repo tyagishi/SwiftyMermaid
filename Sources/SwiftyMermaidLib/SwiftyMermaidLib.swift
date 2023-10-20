@@ -21,7 +21,7 @@ public struct SwiftyMermaidLib {
     
     public static func parseFile(_ fileURL: URL) throws -> [Symbol] {
         let codeString = try String(contentsOf: fileURL, encoding: .utf8)
-        return try SymbolParser.parse(source: codeString)
+        return SymbolParser.parse(source: codeString)
     }
     
     public static func mermaid(from symbolWithURL: [URL: [Symbol]]) -> String {
@@ -41,10 +41,10 @@ public struct SwiftyMermaidLib {
 
         if let inherit = symbol as? InheritingSymbol {
             for inheritedType in inherit.inheritedTypes {
-                result += "\(inheritedType)<|--\(inherit.name)\n"
+                result += "\(inheritedType)<|--\(inherit.name.replacingOccurrences(of: ".", with: "_"))\n"
             }
             result += """
-                      class \(inherit.name.filter{$0 != "."})["\(path+inherit.name)"] {
+                      class \(inherit.name.replacingOccurrences(of: ".", with: "_"))["\(path+inherit.name)"] {
                         <<\(symbol.typeName())>>\n
                       """
             // add properties/methods in the future....
