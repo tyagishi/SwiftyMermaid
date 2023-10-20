@@ -38,8 +38,11 @@ public struct SwiftyMermaidLib {
     
     public static func mermaidString(_ symbol: Symbol, path: String) -> String {
         var result = ""
-
         if let inherit = symbol as? InheritingSymbol {
+            // ignore preview/test
+            guard !inherit.inheritedTypes.contains("PreviewProvider"),
+                  !inherit.inheritedTypes.contains("XCTestCase") else { return "" }
+            
             let inheritName = inherit.name.replacingOccurrences(of: ".", with: "_")
             for inheritedType in inherit.inheritedTypes {
                 result += "\(inheritedType)<|--\(inheritName)\n"
@@ -49,6 +52,8 @@ public struct SwiftyMermaidLib {
                         <<\(symbol.typeName())>>\n
                       """
             // add properties/methods in the future....
+            result += symbol.propertyMermaid()
+            
             result += """
                       }\n
                       """
@@ -80,5 +85,26 @@ extension Symbol {
             return "enum"
         }
         return ""
+    }
+}
+
+extension Symbol {
+    func propertyMermaid() -> String {
+        guard let propSymbol = self as? PropertiedSymbol else { return "" }
+        var propString = ""
+        for prop in propSymbol.properties {
+            propString.append("\(Self.accessControlSymbol(prop.accessControl))\(prop.name): \(prop.type)\n")
+        }
+        return propString
+    }
+    static func accessControlSymbol(_ string: String) -> String {
+        switch string {
+        case "open":         return "+"
+        case "public":       return "+"
+        case "internal":     return "#"
+        case "fileprivate":  return "-"
+        case "private":      return "-"
+        default:             return ""
+        }
     }
 }
